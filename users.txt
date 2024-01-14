@@ -1,0 +1,4 @@
+username:phone_number:password
+Birhanu:090909:123
+www:1231:123
+dd:324:12
