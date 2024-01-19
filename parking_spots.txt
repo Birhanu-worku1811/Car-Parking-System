@@ -1,4 +1,5 @@
 floor:spot_id:car_type:status
-4:2000:auto:available
-4:2345:bus:available
-2:1234:truck:reserved
+4:2345:bus:reserved
+2:1234:truck:available
+2:123:auto:reserved
+0:321:auto:available
