@@ -1,0 +1,4 @@
+plate:spot_id:owner:password
+ET8997:321:kebede:983185
+ET43221:123:someone:812433
+ET23456:2345:abel:376587
