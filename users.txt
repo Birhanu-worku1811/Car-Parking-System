@@ -1,4 +1,4 @@
-username:phone_number:password
+username:phone:password
 Birhanu:090909:123
 www:1231:123
 dd:324:12
