@@ -116,7 +116,7 @@ ParkedCarNode* loadParkedCars() {
 
         if (getline(iss, plate, ':') && getline(iss, spotId, ':') &&
             getline(iss, owner, ':') && getline(iss, password, ':')) {
-            ParkedCarNode* newNode = new ParkedCarNode(plate, spotId, owner, password);
+            auto* newNode = new ParkedCarNode(plate, spotId, owner, password);
 
             if (head == nullptr) {
                 head = newNode;
@@ -652,6 +652,8 @@ void userMenu(const string &username) {
                 break;
             case '0':
                 exit(0);
+            default:
+                cout<<"Invalid choice, try again";
         }
     }
 }
