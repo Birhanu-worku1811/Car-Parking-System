@@ -1,4 +1,7 @@
 4:2345:bus:reserved
 2:1234:truck:reserved
 2:123:auto:reserved
-2:3412:truck:available
+2:3412:truck:reserved
+1:4321:bus:reserved
+2:5432:auto:available
+2:4215:auto:available

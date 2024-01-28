@@ -2,3 +2,4 @@ username:phone:password
 Birhanu:090909:123
 www:1231:123
 dd:324:12
+alemu:0989:12345

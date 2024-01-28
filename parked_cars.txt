@@ -1,4 +1,0 @@
-plate:spot_id:owner:password
-ET43221:123:someone:812433
-ET23456:2345:abel:376587
-ET8989:1234:abebe:287767

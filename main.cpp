@@ -8,6 +8,8 @@
 using namespace std;
 
 
+void welcomeMenu();
+
 struct Users{
     string username,phoneNumber,password;
     Users *next;
@@ -588,10 +590,10 @@ void userMenu(const string &username) {
     char choice;
     string search_by, plate, car_type, spot_id;
     cout << "\nWelcome " << username << "!\n";
-    while (choice != '8') {
+    while (choice != '7' && choice != '0') {
         cout << "\n1.List all spots\n2. List Free Spots\n3."
                 " Search Spots\n4. Where is My car\n5."
-                " Reserve spot\n6. Release spot\n0."
+                " Reserve spot\n6. Release spot\n7. Back\n8. Main Menu\n0."
                 " Exit\n\nEnter your choice:";
         cin >> choice;
         switch (choice) {
@@ -650,6 +652,10 @@ void userMenu(const string &username) {
                 releaseSpot(spot_id);
                 loadSpots();
                 break;
+            case '7':
+                break;
+            case '8':
+                welcomeMenu();
             case '0':
                 exit(0);
             default:
@@ -729,10 +735,11 @@ void adminMenu() {
     string search_by;
     string floor, spot_id, car_type;
     cout << "\nWelcome Admin!, What do you want to do today?\n";
-    while (choice != '0') {
+    while (choice != '0' && choice != 'B') {
         cout << "\n1. Add Parking Spots\n2. View All Spots\n3."
                 " View Free Spots\n4. View Reserved Spots\n5. Search Spots\n6."
-                " Delete spots\n7. Reserve Spots\n8. Release Spots\n9. View all users\nA. Search user\n0. exit\n\nEnter your choice:";
+                " Delete spots\n7. Reserve Spots\n8. Release Spots\n9. "
+                "View all users\nA. Search user\nB. Back\nC. Main Menu\n0. exit\n\nEnter your choice:";
         cin >> choice;
         switch (choice) {
             case '1':
@@ -816,6 +823,10 @@ void adminMenu() {
             case 'A':
                 searchUser();
                 break;
+            case 'B':
+                break;
+            case 'C':
+                welcomeMenu();
             case '0':
                 exit(0);
             default:
@@ -872,7 +883,7 @@ void registerUser(string username, string phone_number, string password) {
     cout << "Registration Success!" << endl;
 }
 
-int main() {
+void welcomeMenu(){
     char choice;
     string username, phone_number, password, password_confirmed;
     cout << "\n\n\t\t\t\t\t\t====WELCOME======\n";
@@ -931,5 +942,9 @@ int main() {
                 cout << "Invalid Choice! Enter Again";
         }
     }
+}
+
+int main() {
+    welcomeMenu();
     return 0;
 }
