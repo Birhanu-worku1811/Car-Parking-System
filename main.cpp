@@ -10,34 +10,36 @@ using namespace std;
 
 void welcomeMenu();
 
-struct Users{
-    string username,phoneNumber,password;
+struct Users {
+    string username, phoneNumber, password;
     Users *next;
 };
 
 struct SpotNode {
     string floor, spotId, carType, status;
-    SpotNode* left;
-    SpotNode* right;
+    SpotNode *left;
+    SpotNode *right;
 
     SpotNode(string floor, string spotId, string carType, string status)
-            : floor(std::move(floor)), spotId(std::move(spotId)), carType(std::move(carType)), status(std::move(status)), left(nullptr), right(nullptr) {}
+            : floor(std::move(floor)), spotId(std::move(spotId)), carType(std::move(carType)),
+              status(std::move(status)), left(nullptr), right(nullptr) {}
 };
 
 struct ParkedCarNode {
     string plate, spotId, owner, password;
-    ParkedCarNode* prev;
-    ParkedCarNode* next;
+    ParkedCarNode *prev;
+    ParkedCarNode *next;
 
     ParkedCarNode(string plate, string spotId, string owner, string password)
-            : plate(std::move(plate)), spotId(std::move(spotId)), owner(std::move(owner)), password(std::move(password)), prev(nullptr), next(nullptr) {}
+            : plate(std::move(plate)), spotId(std::move(spotId)), owner(std::move(owner)),
+              password(std::move(password)), prev(nullptr), next(nullptr) {}
 };
 
-SpotNode* root = nullptr;
-ParkedCarNode* parkedCarsHead = nullptr;
+SpotNode *root = nullptr;
+ParkedCarNode *parkedCarsHead = nullptr;
 
 // resetting spotNode to avoid memory leakage
-void resetSpotNodes(SpotNode* node) {
+void resetSpotNodes(SpotNode *node) {
     if (node != nullptr) {
         resetSpotNodes(node->left);
         resetSpotNodes(node->right);
@@ -47,48 +49,47 @@ void resetSpotNodes(SpotNode* node) {
 
 // Resetting parkedCars doubly linked list to avoid memory leakage
 void resetParkedCarsList() {
-    ParkedCarNode* current = parkedCarsHead;
+    ParkedCarNode *current = parkedCarsHead;
     while (current != nullptr) {
-        ParkedCarNode* next = current->next;
+        ParkedCarNode *next = current->next;
         delete current;
         current = next;
     }
     parkedCarsHead = nullptr;
 }
 
-SpotNode* loadSpots() {
+// Function to insert a spot into the BST
+void insertSpot(const string &floor, const string &spotId, const string &carType, const string &status) {
+    if (root == nullptr) {
+        root = new SpotNode(floor, spotId, carType, status);
+        return;
+    }
+
+    SpotNode *currentNode = root;
+    while (true) {
+        if (spotId < currentNode->spotId) {
+            if (currentNode->left == nullptr) {
+                currentNode->left = new SpotNode(floor, spotId, carType, status);
+                return;
+            } else {
+                currentNode = currentNode->left;
+            }
+        } else {
+            if (currentNode->right == nullptr) {
+                currentNode->right = new SpotNode(floor, spotId, carType, status);
+                return;
+            } else {
+                currentNode = currentNode->right;
+            }
+        }
+    }
+}
+
+SpotNode *loadSpots() {
     // releasing memory of previous spotNode
     resetSpotNodes(root);
     ifstream file("parking_spots.txt");
     string line;
-
-
-    // Function to insert a spot into the BST
-    auto insertSpot = [&](const string& floor, const string& spotId, const string& carType, const string& status) {
-        if (root == nullptr) {
-            root = new SpotNode(floor, spotId, carType, status);
-            return;
-        }
-
-        SpotNode* currentNode = root;
-        while (true) {
-            if (spotId < currentNode->spotId) {
-                if (currentNode->left == nullptr) {
-                    currentNode->left = new SpotNode(floor, spotId, carType, status);
-                    return;
-                } else {
-                    currentNode = currentNode->left;
-                }
-            } else {
-                if (currentNode->right == nullptr) {
-                    currentNode->right = new SpotNode(floor, spotId, carType, status);
-                    return;
-                } else {
-                    currentNode = currentNode->right;
-                }
-            }
-        }
-    };
 
     while (getline(file, line)) {
         istringstream iss(line);
@@ -118,7 +119,7 @@ ParkedCarNode* loadParkedCars() {
 
         if (getline(iss, plate, ':') && getline(iss, spotId, ':') &&
             getline(iss, owner, ':') && getline(iss, password, ':')) {
-            auto* newNode = new ParkedCarNode(plate, spotId, owner, password);
+            ParkedCarNode* newNode = new ParkedCarNode(plate, spotId, owner, password);
 
             if (head == nullptr) {
                 head = newNode;
@@ -158,7 +159,7 @@ bool spotExists(const string &spot_id) {
     return false; // Spot with the given spot_id does not exist
 }
 
-void addSpot(const string& floor, const string& spot_id, const string& car_type) {
+void addSpot(const string &floor, const string &spot_id, const string &car_type) {
     if (spotExists(spot_id)) {
         cout << "Spot with ID " << spot_id << " already exists." << endl;
         return;
@@ -177,7 +178,8 @@ void addSpot(const string& floor, const string& spot_id, const string& car_type)
 void printLine() {
     cout << setfill('-') << setw(60) << "-" << setfill(' ') << endl;
 }
-void inOrderTraversal(SpotNode* node, const string& spotType) {
+
+void inOrderTraversal(SpotNode *node, const string &spotType) {
     if (node != nullptr) {
         inOrderTraversal(node->left, spotType);
 
@@ -196,7 +198,7 @@ void inOrderTraversal(SpotNode* node, const string& spotType) {
     }
 }
 
-void listSpots(SpotNode* spot) {
+void listSpots(SpotNode *spot) {
     if (spot == nullptr) {
         cout << "No parking spots available.\n";
         return;
@@ -215,7 +217,7 @@ void listSpots(SpotNode* spot) {
     cout << endl;
 }
 
-void freeSpots(SpotNode* spot) {
+void freeSpots(SpotNode *spot) {
     if (spot == nullptr) {
         cout << "No parking spots available.\n";
         return;
@@ -234,7 +236,7 @@ void freeSpots(SpotNode* spot) {
     cout << endl;
 }
 
-void reservedSpots(SpotNode* spot) {
+void reservedSpots(SpotNode *spot) {
     if (spot == nullptr) {
         cout << "No reserved parking spots.\n";
         return;
@@ -254,7 +256,7 @@ void reservedSpots(SpotNode* spot) {
 }
 
 //for searching spots by floor and car_type
-void preOrderTraversal(SpotNode* spot, const string& search_by, const string& key) {
+void preOrderTraversal(SpotNode *spot, const string &search_by, const string &key) {
     if (spot != nullptr) {
         if ((search_by == "floor" && spot->floor == key) ||
             (search_by == "car_type" && spot->carType == key)) {
@@ -268,7 +270,7 @@ void preOrderTraversal(SpotNode* spot, const string& search_by, const string& ke
     }
 }
 
-void searchSpots(const string& search_by, const string& key, SpotNode* spot) {
+void searchSpots(const string &search_by, const string &key, SpotNode *spot) {
     if (spot == nullptr) {
         cout << "No parking spots available.\n";
         return;
@@ -276,14 +278,15 @@ void searchSpots(const string& search_by, const string& key, SpotNode* spot) {
 
     if (search_by == "spot_id") {
         // Binary search in the SpotNode for spot_id
-        SpotNode* currentNode = spot;
+        SpotNode *currentNode = spot;
         while (currentNode != nullptr) {
             if (key == currentNode->spotId) {
                 // Found the spot, print information
                 cout << setiosflags(ios::left);
                 cout << "Search results:\n";
                 printLine();
-                cout << setw(10) << "| Floor" << setw(15) << "| Spot ID" << setw(15) << "| Car Type" << setw(15) << "| Status"
+                cout << setw(10) << "| Floor" << setw(15) << "| Spot ID" << setw(15) << "| Car Type" << setw(15)
+                     << "| Status"
                      << "|" << endl;
                 printLine();
                 cout << setw(10) << "| " + currentNode->floor << setw(15) << "| " + currentNode->spotId << setw(15)
@@ -310,7 +313,7 @@ void searchSpots(const string& search_by, const string& key, SpotNode* spot) {
 }
 
 
-void deleteSpots(const string& spot_id) {
+void deleteSpots(const string &spot_id) {
     ifstream file("parking_spots.txt");
     ofstream tempFile("temp.txt");
 
@@ -347,7 +350,7 @@ string generatePassword() {
     return to_string(password);
 }
 
-void reserveSpots(const string& car_type, const string& spot_id) {
+void reserveSpots(const string &car_type, const string &spot_id) {
     // Check if the spot exists and is available
     ifstream file("parking_spots.txt");
     string line;
@@ -425,7 +428,7 @@ void reserveSpots(const string& car_type, const string& spot_id) {
     cout << "Spot with ID " << spot_id << " not found or not available." << endl;
 }
 
-void releaseSpot(const string& spot_id) {
+void releaseSpot(const string &spot_id) {
     ifstream file("parking_spots.txt");
     string line;
 
@@ -451,8 +454,10 @@ void releaseSpot(const string& spot_id) {
                             if (pos1_parked != string::npos) {
                                 int pos2_parked = parkedLine.find(':', pos1_parked + 1);
                                 if (pos2_parked != string::npos) {
-                                    string storedSpotId_parked = parkedLine.substr(pos1_parked + 1, pos2_parked - pos1_parked - 1);
-                                    string owner = parkedLine.substr(pos2_parked + 1, parkedLine.rfind(':') - pos2_parked - 1);
+                                    string storedSpotId_parked = parkedLine.substr(pos1_parked + 1,
+                                                                                   pos2_parked - pos1_parked - 1);
+                                    string owner = parkedLine.substr(pos2_parked + 1,
+                                                                     parkedLine.rfind(':') - pos2_parked - 1);
                                     string password = parkedLine.substr(parkedLine.rfind(':') + 1);
 
                                     if (storedSpotId_parked == spot_id) {
@@ -490,9 +495,12 @@ void releaseSpot(const string& spot_id) {
                                                 if (pos1_spots != string::npos) {
                                                     int pos2_spots = line.find(':', pos1_spots + 1);
                                                     if (pos2_spots != string::npos) {
-                                                        string storedSpotId_spots = line.substr(pos1_spots + 1, pos2_spots - pos1_spots - 1);
+                                                        string storedSpotId_spots = line.substr(pos1_spots + 1,
+                                                                                                pos2_spots -
+                                                                                                pos1_spots - 1);
                                                         if (storedSpotId_spots == spot_id) {
-                                                            tempFileSpots << line.substr(0, line.rfind(':')) << ":available" << endl;
+                                                            tempFileSpots << line.substr(0, line.rfind(':'))
+                                                                          << ":available" << endl;
                                                         } else {
                                                             tempFileSpots << line << endl;
                                                         }
@@ -531,8 +539,8 @@ void releaseSpot(const string& spot_id) {
     cout << "Spot with ID " << spot_id << " not found." << endl;
 }
 
-void findCar(ParkedCarNode* head, const string& plate) {
-    ParkedCarNode* current = head;
+void findCar(ParkedCarNode *head, const string &plate) {
+    ParkedCarNode *current = head;
 
     while (current != nullptr) {
         if (current->plate == plate) {
@@ -605,50 +613,50 @@ void userMenu(const string &username) {
                 break;
             case '3':
                 do {
-                    cout<<"Search by(floor, car_type, spot_id)?\n";
-                    cin>>search_by;
+                    cout << "Search by(floor, car_type, spot_id)?\n";
+                    cin >> search_by;
                     if (search_by != "floor" && search_by != "car_type" && search_by != "spot_id")
-                        cout<<"Invalid search key! please type correctly";
+                        cout << "Invalid search key! please type correctly";
                 } while (search_by != "floor" && search_by != "car_type" && search_by != "spot_id");
                 if (search_by == "floor") {
                     string flr;
                     cout << "Enter the floor number:";
-                    cin>>flr;
+                    cin >> flr;
                     searchSpots("floor", flr, loadSpots());
-                } else if (search_by == "car_type"){
+                } else if (search_by == "car_type") {
                     string crt;
                     do {
-                        cout<<"Choose one(auto, bus, truck):";
-                        cin>>crt;
-                        if (crt !="auto" && crt != "bus" && crt != "truck")
-                            cout<<"Invalid car type!\n";
-                    } while (crt !="auto" && crt != "bus" && crt != "truck");
+                        cout << "Choose one(auto, bus, truck):";
+                        cin >> crt;
+                        if (crt != "auto" && crt != "bus" && crt != "truck")
+                            cout << "Invalid car type!\n";
+                    } while (crt != "auto" && crt != "bus" && crt != "truck");
                     searchSpots("car_type", crt, loadSpots());
-                } else{
+                } else {
                     string id;
-                    cout<<"Enter the spot id:";
-                    cin>>id;
+                    cout << "Enter the spot id:";
+                    cin >> id;
                     searchSpots("spot_id", id, loadSpots());
                 }
                 break;
             case '4':
-                cout<<"\nEnter the plate of the car:";
-                cin>>plate;
+                cout << "\nEnter the plate of the car:";
+                cin >> plate;
                 findCar(loadParkedCars(), plate);
                 break;
             case '5':
-                cout<<endl;
+                cout << endl;
                 listSpots(loadSpots());
-                cout<<"\nWhat type of car do you want to park(auto, bus, truck):";
-                cin>>car_type;
-                cout<<"\nWhere do you want the car to park(Spot ID):";
-                cin>>spot_id;
+                cout << "\nWhat type of car do you want to park(auto, bus, truck):";
+                cin >> car_type;
+                cout << "\nWhere do you want the car to park(Spot ID):";
+                cin >> spot_id;
                 reserveSpots(car_type, spot_id);
                 loadSpots();
                 break;
             case '6':
-                cout<<"Enter the spot ID you want to release:";
-                cin>>spot_id;
+                cout << "Enter the spot ID you want to release:";
+                cin >> spot_id;
                 releaseSpot(spot_id);
                 loadSpots();
                 break;
@@ -659,14 +667,14 @@ void userMenu(const string &username) {
             case '0':
                 exit(0);
             default:
-                cout<<"Invalid choice, try again";
+                cout << "Invalid choice, try again";
         }
     }
 }
 
 
 // to load users from file and store in linked list
-Users* loadUsers() {
+Users *loadUsers() {
     ifstream file("users.txt");
     string line;
 
@@ -696,7 +704,8 @@ Users* loadUsers() {
 
 void printUsers(Users *head) {
     cout << "\nList of Users:\n";
-    cout << setw(25) << left << "| Username" << setw(25) << left << "| Phone Number" << setw(25) << left << "| Password" << "|" << endl;
+    cout << setw(25) << left << "| Username" << setw(25) << left << "| Phone Number" << setw(25) << left << "| Password"
+         << "|" << endl;
     printLine();
     //for skipping the table head
     int a = 0;
@@ -706,17 +715,18 @@ void printUsers(Users *head) {
             head = head->next;
             continue;
         }
-        cout << setw(25) << left << "| " + head->username << setw(25) << left << "| " + head->phoneNumber << setw(25) << left << "| " + head->password << "|" << endl;
+        cout << setw(25) << left << "| " + head->username << setw(25) << left << "| " + head->phoneNumber << setw(25)
+             << left << "| " + head->password << "|" << endl;
         head = head->next;
     }
     printLine();
 }
 
-void searchUser(){
+void searchUser() {
     Users *head = loadUsers();
     string username;
-    cout<<"Enter the username you want to search:";
-    cin>>username;
+    cout << "Enter the username you want to search:";
+    cin >> username;
     while (head != nullptr) {
         if (head->username == username) {
             cout << "User found!\n";
@@ -767,53 +777,53 @@ void adminMenu() {
                 break;
             case '5':
                 do {
-                    cout<<"Search by(floor, car_type, spot_id)?\n";
-                    cin>>search_by;
+                    cout << "Search by(floor, car_type, spot_id)?\n";
+                    cin >> search_by;
                     if (search_by != "floor" && search_by != "car_type" && search_by != "spot_id")
-                        cout<<"Invalid search key! please type correctly";
+                        cout << "Invalid search key! please type correctly";
                 } while (search_by != "floor" && search_by != "car_type" && search_by != "spot_id");
                 if (search_by == "floor") {
                     string flr;
                     cout << "Enter the floor number:";
-                    cin>>flr;
+                    cin >> flr;
                     searchSpots("floor", flr, loadSpots());
-                } else if (search_by == "car_type"){
+                } else if (search_by == "car_type") {
                     string crt;
                     do {
-                        cout<<"Choose one(auto, bus, truck):";
-                        cin>>crt;
-                        if (crt !="auto" && crt != "bus" && crt != "truck")
-                            cout<<"Invalid car type!\n";
-                    } while (crt !="auto" && crt != "bus" && crt != "truck");
+                        cout << "Choose one(auto, bus, truck):";
+                        cin >> crt;
+                        if (crt != "auto" && crt != "bus" && crt != "truck")
+                            cout << "Invalid car type!\n";
+                    } while (crt != "auto" && crt != "bus" && crt != "truck");
                     searchSpots("car_type", crt, loadSpots());
-                } else{
+                } else {
                     string id;
-                    cout<<"Enter the spot id:";
-                    cin>>id;
+                    cout << "Enter the spot id:";
+                    cin >> id;
                     searchSpots("spot_id", id, loadSpots());
                 }
                 break;
             case '6':
-                cout<<endl;
+                cout << endl;
                 listSpots(loadSpots());
-                cout<<"\nEnter the spot id you want to delete:\n";
-                cin>>spot_id;
+                cout << "\nEnter the spot id you want to delete:\n";
+                cin >> spot_id;
                 deleteSpots(spot_id);
                 loadSpots();
                 break;
             case '7':
-                cout<<endl;
+                cout << endl;
                 listSpots(loadSpots());
-                cout<<"\nWhat type of car do you want to park(auto, bus, truck):";
-                cin>>car_type;
-                cout<<"\nWhere do you want the car to park(Spot ID):";
-                cin>>spot_id;
+                cout << "\nWhat type of car do you want to park(auto, bus, truck):";
+                cin >> car_type;
+                cout << "\nWhere do you want the car to park(Spot ID):";
+                cin >> spot_id;
                 reserveSpots(car_type, spot_id);
                 loadSpots();
                 break;
             case '8':
-                cout<<"Enter the spot ID you want to release:";
-                cin>>spot_id;
+                cout << "Enter the spot ID you want to release:";
+                cin >> spot_id;
                 releaseSpot(spot_id);
                 loadSpots();
                 break;
@@ -883,7 +893,7 @@ void registerUser(string username, string phone_number, string password) {
     cout << "Registration Success!" << endl;
 }
 
-void welcomeMenu(){
+void welcomeMenu() {
     char choice;
     string username, phone_number, password, password_confirmed;
     cout << "\n\n\t\t\t\t\t\t====WELCOME======\n";
