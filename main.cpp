@@ -527,7 +527,7 @@ void releaseSpot(const string &spot_id) {
                         }
 
                         parkedFile.close();
-                        cout << "Spot with ID " << spot_id << " not found in parked_cars.txt." << endl;
+                        cout << "Spot with ID " << spot_id << " not found!" << endl;
                         return;
                     }
                 }
